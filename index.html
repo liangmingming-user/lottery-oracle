@@ -18,9 +18,11 @@
   body{
     margin:0;
     background:
-      radial-gradient(1200px 700px at 50% -10%, rgba(120,80,255,.26), transparent 62%),
-      radial-gradient(900px 600px at 50% 115%, rgba(255,150,60,.10), transparent 60%),
-      var(--ink);
+      radial-gradient(1100px 680px at 50% -8%, rgba(128,84,255,.30), transparent 62%),
+      radial-gradient(820px 560px at 86% 16%, rgba(255,120,200,.10), transparent 64%),
+      radial-gradient(900px 620px at 50% 116%, rgba(255,160,70,.18), transparent 62%),
+      radial-gradient(700px 520px at 92% 66%, rgba(90,120,255,.08), transparent 66%),
+      #03030a;
     color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
     min-height:100dvh;
@@ -32,9 +34,31 @@
     -webkit-tap-highlight-color:transparent;
   }
   #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .aurora{
+    position:fixed;inset:-18%;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(38% 30% at 22% 28%, rgba(130,78,255,.34), transparent 70%),
+      radial-gradient(34% 26% at 80% 20%, rgba(255,110,210,.20), transparent 70%),
+      radial-gradient(42% 30% at 60% 82%, rgba(60,175,255,.22), transparent 72%),
+      radial-gradient(30% 24% at 30% 78%, rgba(255,175,60,.14), transparent 70%),
+      radial-gradient(30% 22% at 12% 62%, rgba(90,130,255,.14), transparent 72%);
+    filter:blur(30px);
+    animation:auroraDrift 28s ease-in-out infinite alternate;
+  }
+  @keyframes auroraDrift{
+    0%{transform:translate3d(-2%,-1%,0) scale(1.02)}
+    50%{transform:translate3d(2%,1.5%,0) scale(1.1)}
+    100%{transform:translate3d(-1%,2%,0) scale(1.04)}
+  }
   .vignette{
     position:fixed;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(circle at 50% 45%, transparent 38%, rgba(0,0,0,.55) 100%);
+  }
+  body.glow .vignette{animation:vglow 1.2s ease-out}
+  @keyframes vglow{
+    0%{box-shadow:inset 0 0 0 rgba(255,200,80,0)}
+    28%{box-shadow:inset 0 0 280px rgba(255,200,80,.30)}
+    100%{box-shadow:inset 0 0 0 rgba(255,200,80,0)}
   }
 
   /* ---------- header ---------- */
@@ -121,29 +145,53 @@
   .core{
     position:relative;width:58%;aspect-ratio:1;border-radius:50%;
     display:grid;place-items:center;overflow:hidden;
-    background:radial-gradient(circle at 50% 38%, rgba(70,45,160,.6), rgba(7,5,20,.97) 72%);
-    box-shadow:inset 0 0 60px rgba(0,0,0,.9), 0 0 55px rgba(255,215,120,.10);
+    background:
+      radial-gradient(circle at 50% 50%, transparent 27.6%, rgba(255,215,120,.11) 28%, transparent 28.5%),
+      radial-gradient(circle at 50% 50%, transparent 41.6%, rgba(150,195,255,.09) 42%, transparent 42.5%),
+      radial-gradient(circle at 50% 50%, transparent 55.6%, rgba(255,150,220,.075) 56%, transparent 56.5%),
+      radial-gradient(circle at 50% 38%, rgba(76,48,180,.64), rgba(7,5,20,.97) 72%);
+    box-shadow:inset 0 0 72px rgba(0,0,0,.9), 0 0 62px rgba(255,215,120,.12);
   }
-  .swarm{position:absolute;inset:0;opacity:0;transition:opacity .45s}
+  .core::after{
+    content:"";position:absolute;left:50%;top:50%;width:9%;aspect-ratio:1;z-index:0;
+    transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle at 42% 36%,#fff 0%,rgba(255,226,150,.9) 34%,rgba(255,190,70,.24) 66%,transparent 78%);
+    box-shadow:0 0 18px rgba(255,205,100,.45),0 0 46px rgba(255,180,60,.18);
+    opacity:.55;transition:opacity .8s ease;
+    animation:coreHalo 3.4s ease-in-out infinite;
+  }
+  body[data-phase="done"] .core::after{opacity:.16}
+  @keyframes coreHalo{
+    0%,100%{transform:translate(-50%,-50%) scale(.9)}
+    50%{transform:translate(-50%,-50%) scale(1.12)}
+  }
+  .core .flash{
+    position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;opacity:0;
+    background:radial-gradient(circle,rgba(255,238,180,.95),rgba(255,205,95,.4) 36%,transparent 66%);
+  }
+  .core .flash.go{animation:coreFlash .55s ease-out}
+  @keyframes coreFlash{0%{opacity:.95;transform:scale(.3)}70%{opacity:.45}100%{opacity:0;transform:scale(1.45)}}
+  .swarm{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .45s}
   .swarm i{
     position:absolute;border-radius:50%;
-    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.55) 12%,rgba(255,110,110,.9) 46%,rgba(120,20,40,.9));
-    box-shadow:0 0 10px rgba(255,120,120,.55);
-    animation:jitter 1s ease-in-out infinite alternate;
+    width:var(--s);height:var(--s);
+    left:calc(var(--x) * 1% - var(--s) / 2);
+    top:calc(var(--y) * 1% - var(--s) / 2);
+    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.55) 12%,rgba(255,110,110,.92) 46%,rgba(120,20,40,.92));
+    box-shadow:0 0 12px rgba(255,120,120,.6),0 0 26px rgba(255,120,120,.2);
+    animation:pulse 2.6s ease-in-out infinite alternate;
   }
   .swarm i.blue{
-    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.55) 12%,rgba(110,180,255,.9) 46%,rgba(15,50,130,.9));
-    box-shadow:0 0 10px rgba(110,180,255,.55);
+    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.55) 12%,rgba(110,180,255,.92) 46%,rgba(15,50,130,.92));
+    box-shadow:0 0 12px rgba(110,180,255,.6),0 0 26px rgba(110,180,255,.2);
   }
   .swarm i.gold{
-    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.7) 12%,rgba(255,215,120,.95) 46%,rgba(170,110,10,.95));
-    box-shadow:0 0 12px rgba(255,215,120,.7);
+    background:radial-gradient(circle at 32% 28%,#fff,rgba(255,255,255,.72) 12%,rgba(255,215,120,.96) 46%,rgba(170,110,10,.96));
+    box-shadow:0 0 14px rgba(255,215,120,.75),0 0 32px rgba(255,190,60,.28);
   }
-  @keyframes jitter{
-    0%{transform:translate(0,0) scale(1)}
-    30%{transform:translate(4px,-5px) scale(1.18)}
-    60%{transform:translate(-4px,4px) scale(.88)}
-    100%{transform:translate(3px,5px) scale(1.12)}
+  @keyframes pulse{
+    0%{transform:scale(.88);opacity:.78}
+    100%{transform:scale(1.16);opacity:1}
   }
   body[data-phase="spin"] .swarm{
     opacity:1;
@@ -154,10 +202,16 @@
   body[data-phase="reveal"] .swarm{opacity:0;transition:opacity .5s}
 
   .hint{
-    position:absolute;bottom:12%;z-index:2;
-    font-size:11.5px;letter-spacing:.3em;color:rgba(233,230,255,.42);
+    position:absolute;left:50%;bottom:2.5%;z-index:2;
+    transform:translate(-50%,0);
+    font-size:11.5px;letter-spacing:.3em;color:rgba(233,230,255,.52);
     transition:.5s;white-space:nowrap;
-    text-shadow:0 0 12px rgba(0,0,0,.8);
+    text-shadow:0 0 14px rgba(0,0,0,.92);
+  }
+  .hint.swap{animation:hintSwap .6s ease both}
+  @keyframes hintSwap{
+    0%{opacity:0;transform:translate(-50%,7px)}
+    100%{opacity:1;transform:translate(-50%,0)}
   }
   body[data-phase="idle"] .hint{opacity:0}
   body[data-phase="done"] .hint{opacity:0}
@@ -199,6 +253,15 @@
     animation:rise .65s cubic-bezier(.2,.85,.25,1) both;
   }
   @keyframes rise{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+  @property --ta{syntax:"<angle>";inherits:false;initial-value:0deg}
+  .ticket::before{
+    content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+    background:conic-gradient(from var(--ta),rgba(255,215,120,0) 0deg,rgba(255,215,120,.9) 34deg,rgba(255,215,120,0) 78deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;
+    animation:borderSpin 3.4s linear infinite;
+  }
+  @keyframes borderSpin{to{--ta:360deg}}
   .tname{
     font-size:11px;letter-spacing:.42em;color:rgba(255,215,120,.7);
     padding-left:.42em;
@@ -228,7 +291,13 @@
   }
   .ball.red{--c1:#ff6262;--c2:#8f0d1e}
   .ball.blue{--c1:#62b8ff;--c2:#0c3488}
-  .ball.enter{animation:pop .58s cubic-bezier(.16,.9,.3,1.25) both}
+  .ball.enter{animation:flyIn .74s cubic-bezier(.16,.9,.3,1.25) both}
+  @keyframes flyIn{
+    0%{transform:translate(var(--dx,0px),var(--dy,0px)) scale(.1) rotate(-50deg);opacity:0;filter:blur(10px)}
+    52%{transform:translate(0,0) scale(1.2) rotate(6deg);opacity:1;filter:blur(0)}
+    76%{transform:translate(0,0) scale(.94) rotate(-2deg)}
+    100%{transform:translate(0,0) scale(1) rotate(0)}
+  }
   @keyframes pop{
     0%{transform:scale(.15) rotate(-150deg);opacity:0;filter:blur(6px)}
     55%{transform:scale(1.22) rotate(8deg);opacity:1;filter:blur(0)}
@@ -240,7 +309,7 @@
     margin:0 1px;text-shadow:0 0 12px rgba(255,200,80,.4);
   }
   .ticket .copy{
-    position:absolute;top:8px;right:9px;
+    margin-top:1px;
     appearance:none;border:1px solid rgba(255,255,255,.13);border-radius:999px;
     background:rgba(255,255,255,.05);color:rgba(233,230,255,.48);
     font:inherit;font-size:10.5px;letter-spacing:.08em;
@@ -299,6 +368,7 @@
 </head>
 <body data-phase="idle">
 <canvas id="bg"></canvas>
+<div class="aurora"></div>
 <div class="vignette"></div>
 
 <header>
@@ -325,9 +395,10 @@
       <div class="ring r3"></div>
       <div class="core">
         <div class="swarm" id="swarm"></div>
-        <div class="hint" id="hint">星轨待启</div>
+        <div class="flash" id="coreFlash"></div>
         <button class="start" id="startBtn">启 动 占 卜</button>
       </div>
+      <div class="hint" id="hint">星轨待启</div>
     </div>
   </div>
 
@@ -424,12 +495,12 @@
       }
     }
 
-    for (let t = 0; t < 320; t++){
+    for (let t = 0; t < 900; t++){
       const reds = pickUnique(p0.n, p0.k);
-      if (!accept(reds, t < 220)) continue;
+      if (!accept(reds, t < 700)) continue;
       return [reds, pickBlue()];
     }
-    for (let t = 0; t < 260; t++){                 // 兜底：只保留最核心两条
+    for (let t = 0; t < 200; t++){                 // 兜底：只保留最核心两条
       const reds = pickUnique(p0.n, p0.k);
       const sum = reds.reduce(function(a,b){ return a+b; }, 0);
       if (game === "ssq" && reds.indexOf(32) < 0 && reds.indexOf(33) < 0) continue;
@@ -445,6 +516,8 @@
   const $ = function(s){ return document.querySelector(s); };
   const bodyEl = document.body;
   const swarmEl = $("#swarm");
+  const coreEl = document.querySelector(".core");
+  const coreFlashEl = $("#coreFlash");
   const hintEl = $("#hint");
   const startBtn = $("#startBtn");
   const payoutEl = $("#payout");
@@ -555,7 +628,9 @@
         ph: Math.random() * Math.PI * 2,
         tw: .4 + Math.random() * 1.5,
         c: Math.random() < .12 ? "rgba(255,215,120,.95)"
-          : Math.random() < .2 ? "rgba(150,200,255,.9)" : "rgba(255,255,255,.92)"
+          : Math.random() < .2 ? "rgba(150,200,255,.9)" : "rgba(255,255,255,.92)",
+        vx: (Math.random() - .5) * .055,
+        vy: (Math.random() - .5) * .045
       });
     }
   }
@@ -577,6 +652,29 @@
     }
   }
 
+  let meteors = [];
+  function drawMeteors(dt){
+    if (Math.random() < .012){
+      meteors.push({
+        x: Math.random() * (W + 320) - 160, y: -40,
+        vx: -(2.4 + Math.random() * 2.4), vy: (2.0 + Math.random() * 1.8),
+        life: 1
+      });
+    }
+    for (let i = meteors.length - 1; i >= 0; i--){
+      const m = meteors[i];
+      m.x += m.vx * dt; m.y += m.vy * dt; m.life -= .01 * dt;
+      if (m.life <= 0 || m.y > H + 80 || m.x < -260){ meteors.splice(i, 1); continue; }
+      const tx = m.x - m.vx * 22, ty = m.y - m.vy * 22;
+      const lg = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      lg.addColorStop(0, "rgba(255,244,205," + (m.life * .9) + ")");
+      lg.addColorStop(.4, "rgba(255,215,140," + (m.life * .35) + ")");
+      lg.addColorStop(1, "rgba(255,215,140,0)");
+      ctx.strokeStyle = lg; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tx, ty); ctx.stroke();
+    }
+  }
+
   let lastT = 0;
   function loop(now){
     if (!lastT) lastT = now;
@@ -587,6 +685,9 @@
 
     for (let i = 0; i < stars.length; i++){
       const s = stars[i];
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
+      if (s.y < -2) s.y = H + 2; else if (s.y > H + 2) s.y = -2;
       const a = .18 + .62 * Math.abs(Math.sin(now * .001 * s.tw + s.ph));
       ctx.globalAlpha = a;
       ctx.fillStyle = s.c;
@@ -595,6 +696,7 @@
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+    drawMeteors(dt);
 
     for (let i = parts.length - 1; i >= 0; i--){
       const p = parts[i];
@@ -621,18 +723,24 @@
   /* ================= 摇号球群 ================= */
   function buildSwarm(){
     swarmEl.innerHTML = "";
-    for (let i = 0; i < 28; i++){
+    const N = 36;
+    const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+    const R = 38;                              // 半径上限 %（中心到边缘最多 50%），留边
+    for (let i = 0; i < N; i++){
+      const t = (i + .5) / N;                  // 0 → 1，由内向外
+      const rad = Math.sqrt(t) * R;            // 面积均匀
+      const ang = i * GOLDEN;                  // 黄金角螺旋
+      const size = 15 - 8 * Math.sqrt(t);      // 中心 15px → 边缘 7px
       const b = document.createElement("i");
-      const size = 5 + Math.random() * 11;
-      b.style.width = size + "px";
-      b.style.height = size + "px";
-      b.style.left = (8 + Math.random() * 78) + "%";
-      b.style.top = (8 + Math.random() * 78) + "%";
+      b.style.setProperty("--s", size.toFixed(1) + "px");
+      b.style.setProperty("--x", (50 + Math.cos(ang) * rad).toFixed(2));
+      b.style.setProperty("--y", (50 + Math.sin(ang) * rad).toFixed(2));
       const r = Math.random();
-      if (r < .45) b.className = "blue";
-      else if (r < .62) b.className = "gold";
-      b.style.animationDuration = (.45 + Math.random() * .9).toFixed(2) + "s";
-      b.style.animationDelay = (-Math.random()).toFixed(2) + "s";
+      if (t < .18) b.className = (r < .8 ? "gold" : "");            // 星核：金为主
+      else if (t < .62) b.className = (r < .58 ? "" : (r < .8 ? "gold" : "blue"));  // 中环：红为主
+      else b.className = (r < .55 ? "blue" : (r < .85 ? "" : "gold"));              // 外环：蓝为主
+      b.style.animationDuration = (2.1 + Math.random() * 1.7).toFixed(2) + "s";
+      b.style.animationDelay = (-Math.random() * 2.6).toFixed(2) + "s";
       swarmEl.appendChild(b);
     }
   }
@@ -654,7 +762,14 @@
     "得失在数，喜乐由人。"
   ];
   function showVerse(){
-    verseEl.textContent = "「 " + VERSES[Math.floor(Math.random() * VERSES.length)] + " 」";
+    const text = "「 " + VERSES[Math.floor(Math.random() * VERSES.length)] + " 」";
+    verseEl.textContent = "";
+    let i = 0;
+    const t = setInterval(function(){
+      i++;
+      verseEl.textContent = text.slice(0, i);
+      if (i >= text.length) clearInterval(t);
+    }, 58);
   }
 
   /* ================= 状态机 ================= */
@@ -749,9 +864,22 @@
       for (let i = 0; i < nums.length; i++){
         if (id !== runId) return;
         const b = document.createElement("span");
-        b.className = "ball " + pool.tone + " enter";
+        b.className = "ball " + pool.tone;
         b.textContent = pad(nums[i]);
         group.appendChild(b);
+
+        // 从星核中心飞入
+        const cr = coreEl.getBoundingClientRect();
+        const br = b.getBoundingClientRect();
+        b.style.setProperty("--dx", (cr.left + cr.width / 2 - br.left - br.width / 2).toFixed(1) + "px");
+        b.style.setProperty("--dy", (cr.top + cr.height / 2 - br.top - br.height / 2).toFixed(1) + "px");
+        void b.offsetWidth;
+        b.classList.add("enter");
+
+        // 星核闪光
+        coreFlashEl.classList.remove("go");
+        void coreFlashEl.offsetWidth;
+        coreFlashEl.classList.add("go");
 
         idx++;
         chime(idx);
@@ -778,18 +906,37 @@
     const plan = games.map(function(g){ return { game:g, pools:generate(g) }; });
 
     setPhase("spin");
-    hintText("星轨校准中");
     whoosh();
+
+    const SPIN_WORDS = ["静 心 凝 神", "星 轨 流 转", "天 机 将 现"];
+    let wi = 0;
+    hintText(SPIN_WORDS[0]);
+    const wordTimer = setInterval(function(){
+      wi = (wi + 1) % SPIN_WORDS.length;
+      hintEl.classList.remove("swap");
+      void hintEl.offsetWidth;
+      hintEl.classList.add("swap");
+      hintText(SPIN_WORDS[wi]);
+    }, 640);
 
     const ticker = setInterval(function(){
       tone({freq:80 + Math.random()*140, dur:.045, type:"square", gain:.011});
     }, 76);
+    const beatTimer = setInterval(function(){
+      tone({freq:57, dur:.34, type:"sine", gain:.055, slide:.72});
+      tone({freq:114, dur:.12, type:"triangle", gain:.014});
+    }, 810);
 
-    await wait(1650);
-    if (id !== runId){ clearInterval(ticker); return; }
+    await wait(1980);
+    if (id !== runId){
+      clearInterval(ticker); clearInterval(beatTimer); clearInterval(wordTimer); return;
+    }
 
     setPhase("reveal");
     clearInterval(ticker);
+    clearInterval(beatTimer);
+    clearInterval(wordTimer);
+    hintEl.classList.remove("swap");
 
     for (let i = 0; i < plan.length; i++){
       if (id !== runId) return;
@@ -806,8 +953,13 @@
     hintText("");
     startBtn.textContent = mode === "both" ? "再 摇 一 次" : "再 掷 一 次";
 
+    document.body.classList.add("glow");
+    setTimeout(function(){ document.body.classList.remove("glow"); }, 1250);
+
     const orb = document.querySelector(".orb").getBoundingClientRect();
-    burst(orb.left + orb.width/2, orb.top + orb.height/2, "gold", 70);
+    const ox = orb.left + orb.width / 2, oy = orb.top + orb.height / 2;
+    burst(ox, oy, "gold", 90);
+    setTimeout(function(){ burst(ox, oy, "gold", 55); }, 230);
 
     busy = false;
   }
